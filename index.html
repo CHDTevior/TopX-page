@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TopX: Text-to-Motion for Unseen Skeletons</title>
+<meta name="description" content="TopX generates text-driven motion for skeletons unseen in training, from the skeleton file alone.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+</head>
+<body>
+<style>
+:root{--bg:#f7f6f2;--panel:#ffffff;--fg:#1d2321;--muted:#5b6662;--line:#dfe2dc;--accent:#1f6f62;--accent-soft:#e3efeb;--warm:#c25a2c;--code:#eef0ec;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141816;--panel:#1b201e;--fg:#e7ebe8;--muted:#a3ada8;--line:#2e3532;--accent:#5fbfa9;--accent-soft:#1f2f2b;--warm:#e58a5d;--code:#222926;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141816;--panel:#1b201e;--fg:#e7ebe8;--muted:#a3ada8;--line:#2e3532;--accent:#5fbfa9;--accent-soft:#1f2f2b;--warm:#e58a5d;--code:#222926;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 "Source Serif 4",Georgia,serif;margin:0}
+.wrap{max-width:1060px;margin:0 auto;padding-inline:20px;padding-block:0 64px}
+.sans{font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+header{text-align:center;padding-block:56px 28px}
+h1{font:700 clamp(30px,5vw,46px)/1.12 "Inter",system-ui,sans-serif;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+h1 .name{color:var(--accent)}
+.sub{font-size:clamp(17px,2.4vw,21px);color:var(--muted);margin:0 0 22px;text-wrap:balance}
+.authors{font-size:17px;margin:0 0 4px}
+.authors span{white-space:nowrap;margin:0 .45em}
+.affil{color:var(--muted);font-size:15px;margin:0}
+.affil span{white-space:nowrap;margin:0 .6em}
+.note{color:var(--muted);font-size:13px;margin-top:4px}
+.links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;background:var(--fg);color:var(--bg);text-decoration:none;font:600 15px "Inter",system-ui,sans-serif}
+.btn.off{background:var(--line);color:var(--muted);pointer-events:none}
+.btn svg{width:17px;height:17px;fill:currentColor}
+section{margin-top:56px}
+h2{font:700 24px/1.25 "Inter",system-ui,sans-serif;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance}
+h2 small{display:block;font-weight:500;font-size:15px;color:var(--muted);letter-spacing:0;margin-top:4px}
+p{margin:0 0 14px}
+.prose{max-width:76ch}
+.center{text-align:center}
+figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+figure img{display:block;width:100%;height:auto;border-radius:6px;background:#fff}
+figcaption{color:var(--muted);font-size:14.5px;margin-top:10px;line-height:1.5}
+.teaser{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.card video{display:block;width:100%;height:auto;background:#fff;aspect-ratio:1280/666}
+.card .cap{padding:10px 14px 12px;font-size:14.5px;line-height:1.45}
+.cap .q{font-style:italic}
+.cap .meta{display:block;color:var(--muted);font:500 12.5px/1.4 "Inter",system-ui,sans-serif;margin-top:4px;letter-spacing:.01em}
+.tag{display:inline-block;font:600 11px "Inter",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px;margin-bottom:6px}
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font:14px/1.4 "Inter",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+th,td{padding:8px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+td.num,th.num{text-align:right}
+tr.sep td{border-top:2px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+.hl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.hl div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.hl b{display:block;font:700 22px "Inter",system-ui,sans-serif;color:var(--accent)}
+.hl span{color:var(--muted);font-size:14px}
+pre{background:var(--code);border-radius:10px;padding:16px;overflow-x:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0;position:relative}
+.copy{position:absolute;top:8px;right:8px;font:600 12px "Inter",system-ui,sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:4px 10px;cursor:pointer}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px;text-align:center}
+a{color:var(--accent)}
+@media (max-width:760px){.grid2,.teaser,.hl{grid-template-columns:minmax(0,1fr)}header{padding-block:36px 18px}}
+</style>
+
+<div class="wrap">
+<header>
+  <h1><span class="name">TopX</span>: Text-to-Motion for Unseen Skeletons from the Skeleton File Alone</h1>
+  <p class="authors">
+    <span>Tengjiao Sun<sup>1,3</sup></span> <span>Pengcheng Fang<sup>1,3</sup></span> <span>Xiaoyu Zhan<sup>2,3</sup></span> <span>Dongjie Fu<sup>2</sup></span> <span>Xiaohao Cai<sup>1</sup></span> <span>Hansung Kim<sup>1&dagger;</sup></span>
+  </p>
+  <p class="affil"><span><sup>1</sup>University of Southampton</span> <span><sup>2</sup>Nanjing University</span> <span><sup>3</sup>MOGO AI</span></p>
+  <p class="note"><sup>&dagger;</sup>Corresponding author</p>
+  <div class="links">
+    <a class="btn off" href="#" aria-disabled="true"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zM14 3v5h5"/></svg>Paper (arXiv, coming soon)</a>
+    <a class="btn" href="https://github.com/CHDTevior/TopX-OOD-Code"><svg viewBox="0 0 24 24"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>Code</a>
+    <a class="btn" href="https://huggingface.co/Tevior/TopX-OOD"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-3.5 7a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6zm7 0a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6zM7.5 14h9a4.5 4.5 0 0 1-9 0z"/></svg>Weights</a>
+  </div>
+</header>
+
+<div class="teaser">
+  <div class="card"><video src="static/videos/ours21.mp4" poster="static/posters/ours21.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
+  <div class="card"><video src="static/videos/ours15.mp4" poster="static/posters/ours15.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
+  <div class="card"><video src="static/videos/ours08.mp4" poster="static/posters/ours08.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
+</div>
+<p class="center sans" style="color:var(--muted);font-size:14px;margin-top:10px">One model, three skeletons it was never trained on: a 40-joint Truebones stegosaurus, a 66-joint capybara of a held-out species and a 65-joint humanoid. Each is generated from its skeleton file and a caption.</p>
+
+<section class="prose">
+  <h2>Abstract</h2>
+  <p>Text-to-motion models generate motion only for the skeletons they were trained on, while a new character arrives as a skeleton file and nothing else. We study text-to-motion for skeletons unseen in training, without clips of the character, templates, retargeting or fine-tuning. We present TopX, a 73M-parameter flow-matching transformer that generates joint rotations and a root trajectory for any skeleton from its kinematic tree, rest pose and joint names. Motion is normalised by the rest pose and the size of the skeleton, and the rest pose is encoded as a world-frame descriptor that is independent of how the rig's author oriented each joint, while rest conventions are randomised during training. Attention is factorised over the joints and the frames of a motion. Across joints, queries and keys are rotated by HK-RoPE, a heat-kernel rotary encoding of the skeleton graph that is defined for every tree and does not change with the order of its joints or the eigenbasis of its Laplacian; across frames, they are rotated by a rotary encoding of frame order.</p>
+  <p>To evaluate this generalisation, we build SkelShift, which unifies four motion corpora under one codec and holds out whole skeletons, tree classes and species, so that each test bucket isolates one kind of skeleton shift: topology, joint count, body plan, species or rig source. It scores motion quality without a learned evaluator. A single model animates every benchmark skeleton (4&ndash;117 joints) directly from its skeleton file and generates up to 240 frames. On held-out game species its motion is about as close to the real clips as two halves of the real clips are to each other (kernel distance 0.127 against 0.124), and text-to-motion retrieval reaches R@1 0.953, compared with 0.929 for real motion.</p>
+</section>
+
+<section>
+  <h2>Method<small>Factorised attention with HK-RoPE</small></h2>
+  <figure>
+    <img src="static/images/method.jpg" alt="TopX overview: the skeleton file gives every joint a feature; motion tokens, one per joint and frame, pass through ten blocks of temporal attention, spatial attention with heat-kernel joint RoPE, and an FFN; sampling from noise yields motion on the unseen skeleton." loading="lazy">
+    <figcaption><b>&#10102;</b> No clips of an unseen skeleton are needed. Its tree, rest pose and joint names give each joint a feature (an MLP of tree and rest-pose features plus the LLM2Vec embedding of the joint's description). The motion tokens, one per joint and frame, are normalised by the rest pose and the skeleton's size, so that the rest frame maps to zero. <b>&#10103;</b> Each of ten blocks attends over time with queries and keys rotated by &theta;<sub>f</sub> = f&omega;, and over joints with queries and keys rotated by HK-RoPE, whose angle &theta;<sub>j</sub> is an MLP of joint j's heat-kernel signature at eight scales on the tree, together with a bias on tree hops. Mesh colours show the first principal component of the log signature, on a colour scale shared by all skeletons. The caption and the flow time condition the network through AdaLN.</figcaption>
+  </figure>
+  <div class="hl sans">
+    <div><b>Any tree</b><span>The heat-kernel signature is defined for every skeleton and does not depend on the order of its joints.</span></div>
+    <div><b>Skeleton file only</b><span>Tree, rest pose and joint names; no clips, templates, retargeting or fine-tuning.</span></div>
+    <div><b>Drives the rig</b><span>Outputs joint rotations and a root trajectory, exported as BVH of the input hierarchy.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>SkelShift<small>Each test bucket holds out one kind of skeleton shift</small></h2>
+  <p class="prose">SkelShift unifies the Objaverse-XL subset of UniML3D, the AniMo4D animal library with HumanML3D, further species from the same game library, and the Truebones zoo under one codec: 139,102 training clips on 5,127 rigs with 6 to 142 joints. The test set holds out clips, rigs, classes of isomorphic trees and species.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Bucket</th><th>Source</th><th>Unseen at test time</th><th class="num">Test clips</th><th class="num">Rigs</th><th class="num">Joints</th></tr></thead>
+    <tbody>
+      <tr><td>ID-clip</td><td>UniML3D</td><td>clips of training rigs</td><td class="num">172</td><td class="num">135</td><td class="num">10&ndash;60</td></tr>
+      <tr><td>ID-tree</td><td>UniML3D</td><td>rigs whose tree is seen</td><td class="num">508</td><td class="num">759</td><td class="num">6&ndash;60</td></tr>
+      <tr class="sep"><td>OOD-tree</td><td>UniML3D</td><td>tree classes (bipeds, quadrupeds)</td><td class="num">320</td><td class="num">333</td><td class="num">11&ndash;60</td></tr>
+      <tr><td>OOD-plan</td><td>UniML3D</td><td>tree classes of rare body plans</td><td class="num">62</td><td class="num">70</td><td class="num">5&ndash;60</td></tr>
+      <tr><td>OOD-J&gt;60 (Mixamo)</td><td>UniML3D</td><td>rigs of one 65-joint humanoid tree</td><td class="num">350</td><td class="num">250</td><td class="num">65</td></tr>
+      <tr><td>OOD-J&gt;60 (other)</td><td>UniML3D</td><td>rigs above the corpus's joint range</td><td class="num">512</td><td class="num">464</td><td class="num">61&ndash;117</td></tr>
+      <tr><td>OOD-J&lt;5</td><td>UniML3D</td><td>rigs below that range</td><td class="num">1</td><td class="num">2</td><td class="num">4</td></tr>
+      <tr><td>OOD-species</td><td>game</td><td>four species, three rigs each</td><td class="num">635</td><td class="num">12</td><td class="num">41&ndash;66</td></tr>
+      <tr><td>OOD-new-species</td><td>game</td><td>rigs of ten untrained species</td><td class="num">47</td><td class="num">10</td><td class="num">28&ndash;78</td></tr>
+      <tr><td>OOD-rig</td><td>Truebones</td><td>eight quadruped rigs</td><td class="num">62</td><td class="num">8</td><td class="num">31&ndash;49</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Results on unseen skeletons<small>Whole outputs, up to 240 frames, played in real time</small></h2>
+  <p class="prose sans" style="color:var(--muted);font-size:14.5px">Stick figures drawn from the generated joint positions, frame by frame, with no smoothing. The large view follows the root joint; the small view below is a fixed camera that shows where the skeleton travels. Clips were chosen by a fixed rule on the real test clips (the most energetic and the longest of each subset), not by looking at generated motion.</p>
+  <div class="grid2">
+    <div class="card"><video src="static/videos/ours21.mp4" poster="static/posters/ours21.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Truebones skeleton</span><br><span class="q">&ldquo;The stegosaurus raises its head slightly and shakes its body from side to side&rdquo;</span><span class="meta">Stego &middot; 40 joints &middot; 200 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours26.mp4" poster="static/posters/ours26.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Truebones skeleton</span><br><span class="q">&ldquo;The stegosaurus performs a tail whip by rotating its tail from right to left&rdquo;</span><span class="meta">Stego &middot; 40 joints &middot; 140 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours22.mp4" poster="static/posters/ours22.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Truebones skeleton</span><br><span class="q">&ldquo;The cat stretches and yawns, then returns to a sitting position&rdquo;</span><span class="meta">Cat &middot; 43 joints &middot; 199 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours23.mp4" poster="static/posters/ours23.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Truebones skeleton</span><br><span class="q">&ldquo;The goat quickly steps back, jumps forward, and mimics a headbutting motion before returning to its original position&rdquo;</span><span class="meta">Goat &middot; 31 joints &middot; 110 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours27.mp4" poster="static/posters/ours27.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Truebones skeleton</span><br><span class="q">&ldquo;The turtle prepares and executes an attack by rolling forward&rdquo;</span><span class="meta">Turtle &middot; 49 joints &middot; 180 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours15.mp4" poster="static/posters/ours15.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Held-out species</span><br><span class="q">&ldquo;A female capybara changes pose, with movement of its head and forelimbs.&rdquo;</span><span class="meta">Capybara &middot; 66 joints &middot; 240 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours18.mp4" poster="static/posters/ours18.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Untrained species</span><br><span class="q">&ldquo;A spectacled flying fox changes pose, with movement of its forelimbs and head.&rdquo;</span><span class="meta">Spectacled flying fox &middot; 70 joints &middot; 130 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours19.mp4" poster="static/posters/ours19.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">Untrained species</span><br><span class="q">&ldquo;A danube crested newt changes pose, with movement of its tail and head.&rdquo;</span><span class="meta">Danube crested newt &middot; 68 joints &middot; 240 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours08.mp4" poster="static/posters/ours08.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">More than 60 joints</span><br><span class="q">&ldquo;An object runs in place and does a handstand.&rdquo;</span><span class="meta">65-joint humanoid &middot; 240 frames</span></div></div>
+    <div class="card"><video src="static/videos/ours10.mp4" poster="static/posters/ours10.jpg" controls muted loop playsinline preload="metadata"></video><div class="cap"><span class="tag">More than 60 joints</span><br><span class="q">&ldquo;An object dances in place.&rdquo;</span><span class="meta">65-joint skeleton &middot; 240 frames</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Rendered on the rig's own mesh</h2>
+  <figure>
+    <img src="static/images/qualitative.jpg" alt="Samples on unseen test skeletons drawn on each rig's mesh, five frames per sample." loading="lazy">
+    <figcaption>Samples on unseen test skeletons, each drawn on the rig's own mesh: five frames at equal times, light to dark. (a) TopX and UniMate trained on the same clips, on four rigs that neither was trained on. (b) TopX on two held-out game species; squares show the root path from above.</figcaption>
+  </figure>
+</section>
+
+<section class="prose">
+  <h2>BibTeX</h2>
+<pre id="bib">@article{sun2026topx,
+  title   = {TopX: Text-to-Motion for Unseen Skeletons from the Skeleton File Alone},
+  author  = {Sun, Tengjiao and Fang, Pengcheng and Zhan, Xiaoyu and Fu, Dongjie and Cai, Xiaohao and Kim, Hansung},
+  journal = {arXiv preprint},
+  year    = {2026}
+}<button class="copy" type="button" onclick="(function(b){var t=document.getElementById('bib').firstChild.textContent;try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied'},function(){b.textContent='Select to copy'})}catch(e){b.textContent='Select to copy'}})(this)">Copy</button></pre>
+</section>
+
+<footer class="sans">Skeletons in the videos: UniML3D (Objaverse-XL), AniMo4D game species and the Truebones zoo. Meshes in the figures are for display only; the human mesh is SMPL+H.</footer>
+</div>
+
+</body>
+</html>
