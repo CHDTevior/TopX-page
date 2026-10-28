@@ -39,7 +39,8 @@ p{margin:0 0 14px}
 figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
 figure img{display:block;width:100%;height:auto;border-radius:6px;background:#fff}
 figcaption{color:var(--muted);font-size:14.5px;margin-top:10px;line-height:1.5}
-.teaser{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.banner{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#d9d7d2}
+.banner video{display:block;width:100%;height:auto;aspect-ratio:3/1}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
 .card video{display:block;width:100%;height:auto;background:#fff;aspect-ratio:1280/666}
@@ -62,7 +63,7 @@ pre{background:var(--code);border-radius:10px;padding:16px;overflow-x:auto;font:
 .copy{position:absolute;top:8px;right:8px;font:600 12px "Inter",system-ui,sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:4px 10px;cursor:pointer}
 footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px;text-align:center}
 a{color:var(--accent)}
-@media (max-width:760px){.grid2,.teaser,.hl{grid-template-columns:minmax(0,1fr)}header{padding-block:36px 18px}}
+@media (max-width:760px){.grid2,.hl{grid-template-columns:minmax(0,1fr)}header{padding-block:36px 18px}}
 </style>
 
 <div class="wrap">
@@ -80,12 +81,8 @@ a{color:var(--accent)}
   </div>
 </header>
 
-<div class="teaser">
-  <div class="card"><video src="static/videos/ours21.mp4" poster="static/posters/ours21.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
-  <div class="card"><video src="static/videos/ours15.mp4" poster="static/posters/ours15.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
-  <div class="card"><video src="static/videos/ours08.mp4" poster="static/posters/ours08.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
-</div>
-<p class="center sans" style="color:var(--muted);font-size:14px;margin-top:10px">One model, three skeletons it was never trained on: a 40-joint Truebones stegosaurus, a 66-joint capybara of a held-out species and a 65-joint humanoid. Each is generated from its skeleton file and a caption.</p>
+<div class="banner"><video src="static/videos/banner.mp4" poster="static/posters/banner.jpg" autoplay muted loop playsinline preload="auto"></video></div>
+<p class="center sans" style="color:var(--muted);font-size:14px;margin-top:10px">One model, ten skeletons it was never trained on.</p>
 
 <section class="prose">
   <h2>Abstract</h2>
@@ -163,7 +160,7 @@ a{color:var(--accent)}
 }<button class="copy" type="button" onclick="(function(b){var t=document.getElementById('bib').firstChild.textContent;try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied'},function(){b.textContent='Select to copy'})}catch(e){b.textContent='Select to copy'}})(this)">Copy</button></pre>
 </section>
 
-<footer class="sans">Skeletons in the videos: UniML3D (Objaverse-XL), AniMo4D game species and the Truebones zoo. Meshes in the figures are for display only; the human mesh is SMPL+H.</footer>
+<footer class="sans"><p style="margin:0 0 8px">Banner models, front row then back row, left to right: <a href="https://sketchfab.com/3d-models/c924da45e35d437fa1e44bc110f5cb3a">Tyrannosaurus Rex With Fixed Colour</a> by dinomaster (CC BY 4.0); <a href="https://truebones.gumroad.com/">Lynx</a> by Truebones Zoo (rendered under its terms of use); <a href="https://sketchfab.com/3d-models/b549280b41334c3494c66dfa5114012a">Project Artificial Intelligence</a> by Headsketch (CC BY 4.0); <a href="https://sketchfab.com/3d-models/9d72445803604cdca5bd965dc8d16f46">Velociraptor 1+motions</a> by Kapi777 (CC BY 4.0); <a href="https://truebones.gumroad.com/">Cat</a> by Truebones Zoo (rendered under its terms of use); <a href="https://sketchfab.com/3d-models/3ad789f966f54c8085349da0f89bfedb">Abeja volando</a> by Jorge.Cristiany (CC BY 4.0); <a href="https://github.com/XertDev/graphics-labs">eagle</a> by XertDev/graphics-labs (MIT); <a href="https://github.com/softdev0arvr/VRsus-guARdian">Ray</a> by softdev0arvr/VRsus-guARdian (MIT); <a href="https://sketchfab.com/3d-models/5841755cf7a44b93872dbc22fac36f90">小蜘蛛怪</a> by irvinlin (CC BY 4.0); <a href="https://truebones.gumroad.com/">Stego</a> by Truebones Zoo (rendered under its terms of use). Only their skeletons and meshes are used; the motion is generated.</p>Skeletons in the videos: UniML3D (Objaverse-XL), AniMo4D game species and the Truebones zoo. Meshes in the figures are for display only; the human mesh is SMPL+H.</footer>
 </div>
 
 </body>
